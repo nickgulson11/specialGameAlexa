@@ -92,7 +92,7 @@ class Game:
     def win_game(player):
         print('''
         --> Congratulations you have answered all the questions correctly and recovered all the plush animals.
-            Nick has been saved from the mormons.  Hooray your reward is a 15 minute soak.  Love prevails and you win!''')
+            Nick has been saved from the mormons.  Your reward is a 15 minute soak, hooray!  Love prevails and you win!''')
         quit()
 
     def ask_question(self, elementis):
