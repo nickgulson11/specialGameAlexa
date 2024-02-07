@@ -7,15 +7,11 @@ import random
 
 def programme_start():
     player_name = ''
-    input_start = input ('--> Type "start" and press enter to begin a new game: ')
-    while input_start != 'start':
-        input_start = input ('--> Type "start" and press enter to begin a new game: ')
+    player_name = input ('--> Hello and welcome to a very special secret game.  What is your name? ')
+    while player_name.lower() != 'emily':
+        player_name = input ('--> Hmm this game is not for you, try again. What is your name? ')
     else:
-        player_name = input ('--> Now, type your name and press enter to start your Journey: ')
-        while player_name == '':
-            player_name = input ('--> I said, type your name and press enter to start your Journey: ')
-        else:
-            return player_name.title()
+        return player_name.title()
 
 # Create class for Player in game:
 
@@ -24,23 +20,22 @@ class Player:
     def __init__(self, name):
         self.player = 'Player 1'
         self.name = name
-        self.life = 10
+        self.life = 3
         self.item_container = []
         
     def __repr__(self):
         return ('''
-        --> Welcome {name} to the start of your Journey!
-            From here you will be faced with a series of questions that will give you to all Elementis.
-            As is the way of All, you shall be given {life} lives and an item container to complete your journey.
-            Your item container currently contains {number} items.
-            Once it has been loaded with all items of the Elementis, you shall see the Truths of the Elementis.
+        --> Welcome {name} thank chwod you have arrived.  Nick has been kidnapped by mormons and we need your help to free him!
+            The mormons don't believe in monogomous love.  You must answer all these chwestions correctly to save Nick.
+            You have been given {life} hearts to complete the game. If you lose them all then Nick chwies.
+            Your Chwackpack currently contains {number} items.  Collect them all to save his life!
         '''.format(name = self.name, life = self.life, number = len(self.item_container)))
 
     def get_reward(self, elementis):
         print('--> Your reward for this is {reward}'.format(reward = elementis.reward))
         player_1.item_container.append(elementis.reward)
         print('--> Your item container now holds {items}.'.format(items = player_1.item_container))
-        if len(self.item_container) == 6:
+        if len(self.item_container) == 5:
             Game.win_game(self)
 
     def store_reward(self, elementis_reward):
@@ -51,11 +46,11 @@ class Player:
         if self.life > 0:
             print('''
             --> That is not the correct answer.
-                You now have {lives} lives remaining.'''.format(lives = self.life))
+                You now have {lives} hearts remaining.'''.format(lives = self.life))
         else:
             print('''
-            --> GAME OVER!
-                Better luck next time =}''')
+            --> That was your last heart.  You lose and the mormons kill Nick.
+                Better luck next time, Bye!''')
 
 # Create class for Elementis:
 class Elementis:
@@ -75,7 +70,7 @@ class Elementis:
 class Game:
     
     def __init__(self, player):
-        self.game_elementis_list = ['cosmos', 'flame', 'aqua', 'mystic', 'chaos', 'order']
+        self.game_elementis_list = ['cosmos', 'flame', 'aqua', 'mystic', 'chaos']
         self.correctly_answered = []
         print(player)
         Game.game_init(self, player)
@@ -84,79 +79,21 @@ class Game:
         pass
 
     def game_init(self, player):
-        print('--> Is it time to start?')
+        print('--> Are you ready to begin?')
         y_n = input ('--> Type Y/N and press enter: ')
-        while y_n != 'y' and y_n != 'n':
+        while y_n.lower() != 'y' and y_n.lower() != 'n':
              y_n = input ('--> Type Y/N and press enter: ')
-        if y_n == 'n':
-            print ('--> Come back when you are ready, for the Journey.')
+        if y_n.lower() == 'n':
+            print ('--> Okay Nick will go die then, bye.')
             quit()
         else:
-            Game.journey_trigger(self, player)
-
-    def journey_trigger(self, player):
-        print ('--> {name}, it is time to make your choice.'.format(name = player.name))
-        print ( '''
-            These are the Elementis of the Journey:
-            - Cosmos
-            - Flame
-            - Aqua
-            - Mystic
-            - Chaos
-            - Order
-            You must make a selection for your own journey to begin.
-            Choose wisely, it could effect your entire existence...''')
-        start_choice = input ('--> What do you choose? ')
-        while start_choice not in elementis_dict.keys():
-            start_choice = input ('--> You did not select one of the Elementis. Choose again: ')
-        if start_choice == 'cosmos':
-            elementis = cosmos
-            Game.start_journey(self, player_1, elementis)
-        elif start_choice == 'flame':
-            elementis = flame
-            Game.start_journey(self, player_1, elementis)
-        elif start_choice == 'aqua':
-            elementis = aqua
-            Game.start_journey(self, player_1, elementis)
-        elif start_choice == 'mystic':
-            elementis = mystic
-            Game.start_journey(self, player_1, elementis)
-        elif start_choice == 'chaos':
-            elementis = chaos
-            Game.start_journey(self, player_1, elementis)
-        elif start_choice == 'order':
-            elementis = order
-            Game.start_journey(self, player_1, elementis)
-            
-    def start_journey(self, player, trigger_choice):
-        choice = trigger_choice
-        print('''
-        --> {name} has decided to start the Journey with {choice}.
-            We will now begin the journey.'''.format(name = player.name, choice = choice.name))
-        answer = input ('--> Are you ready, {name}? Y/N: '.format(name = player.name))
-        while answer != 'y' and answer != 'n':
-            answer = input ('--> Are you ready, {name}? Y/N: '.format(name = player.name))
-        if answer == 'y':
-            Game.ask_question(self, choice)
-        else:
-            print('--> Fret not. When you are ready, return to start your Journey Through.')
-    
+            Game.ask_question(self, chaos)
+        
     def win_game(player):
-        if player_1.life == 10:
-            print('''
-            --> You have mastered the Elementis and completed your Journey Through.
-                Go forth and seek.''')
-            quit()
-        elif player_1.life == 1:
-            print('''
-            --> You end your Journey Through with one life only.
-                This is the life you should live, now experience the Journey of a Single Life.''')
-            quit()
-        else:
-            print('''
-            --> Congratulations you have completed the Journey.
-                If ever you are lost, return to A Journey Through again to find a path.''')
-            quit()
+        print('''
+        --> Congratulations you have answered all the questions correctly and recovered all the plush animals.
+            Nick has been saved from the mormons.  Hooray your reward is a 15 minute soak.  Love prevails and you win!''')
+        quit()
 
     def ask_question(self, elementis):
         print ('--> {question}'.format(question = elementis.question))
@@ -175,7 +112,7 @@ class Game:
         if answer == elementis.correct_answer:
             Game.correct_answer(self, elementis)
         else:
-            Game.wrong_answer(self)
+            Game.wrong_answer(self, elementis)
 
     def correct_answer(self, elementis):
         print('--> Well done! You have chosen the correct answer!')
@@ -185,10 +122,10 @@ class Game:
         next_elementis = Game.elementis_rand_select(self)
         Game.ask_question(self, next_elementis)
 
-    def wrong_answer(self):
+    def wrong_answer(self, elementis):
         print('--> Oh no! You have chosen the wrong answer!')
         player_1.lose_a_life()
-        next_elementis = Game.elementis_rand_select(self)
+        next_elementis = elementis
         Game.ask_question(self, next_elementis)
 
     def elementis_rand_select(self):
@@ -201,10 +138,8 @@ class Game:
             return aqua
         elif next_elementis == 'mystic':
             return mystic
-        elif next_elementis == 'chaoos':
+        elif next_elementis == 'chaos':
             return chaos
-        elif next_elementis == 'order':
-            return order
         
 
 #Creat dict of Elementis for object inits:
@@ -218,7 +153,7 @@ elementis_dict = {
                                                 3 : 'Impossible to quantify limitless',
                                                 4 : 'No, but one day'},
                                     'correct answer': '3',
-                                    'reward' : 'An Origin of Journey'},
+                                    'reward' : 'Bernardo'},
                         'flame' : {
                             'name' : 'Flame',
                             'question' : 'Can one find the source of the Healing Flame?',
@@ -227,7 +162,7 @@ elementis_dict = {
                                                 3 : 'No',
                                                 4 : 'Yes, can be created by craftsman'},
                                     'correct answer' : '2',
-                                    'reward' : 'Ember of Burning Spirit'},
+                                    'reward' : 'Maritza'},
                         'aqua' : {
                             'name' : 'Aqua',
                             'question' : 'In the Waters of Forever, how does one survive?',
@@ -236,7 +171,7 @@ elementis_dict = {
                                                 3 : 'Drink it all',
                                                 4 : 'Hold your breath'},
                                     'correct answer' : '1',
-                                    'reward' : 'Drink of the One True'},
+                                    'reward' : 'Judy'},
                         'mystic' : {
                             'name' : 'Mystic',
                             'question' : 'In the Arcane, is there any limitation true?',
@@ -245,7 +180,7 @@ elementis_dict = {
                                                 3 : 'Yes, spells contained in spellbooks',
                                                 4 : 'One can never be restricted if one\'s mind is endless'},
                                     'correct answer' : '4',
-                                    'reward' : 'Enchantment of Expanse'},
+                                    'reward' : 'Pineapple Jellycat'},
                         'chaos' : {
                             'name' : 'Chaos',
                             'question' : 'Was there ever truly order in the Expanse?',
@@ -254,16 +189,7 @@ elementis_dict = {
                                                 3 : 'No, we just believe there is',
                                                 4 : 'Yes, but only in the beginning'},
                                     'correct answer' : '2',
-                                    'reward' : 'Flow of Chaos Arc'},
-                        'order' : {
-                            'name' : 'Order',
-                            'question' : 'All things have order, whilst nothing has none. Does any One Being see the Truth?',
-                                    'answers' : {1 : 'Yes, everyone can if thhey look properly',
-                                                2 : 'No, how can one see the intangible?',
-                                                3 : 'Yes, make peace with Chaos to see Truth',
-                                                4 : 'Nothing ever truly exists to be ordered'},
-                                    'correct answer' : '4',
-                                    'reward' : 'Sight of Ordered Emptiness'}
+                                    'reward' : 'Scarlett'}
                     }
 # Base code for dict quick create template - copy and paste.
 base_code = {'name' : '', 'question' : '', 'answers' : {1 : '', 2 : '', 3 : '', 4 : ''}, 'correct answer' : '', 'reward' : ''}
@@ -275,8 +201,7 @@ flame = Elementis('flame')
 aqua = Elementis('aqua')
 mystic = Elementis('mystic')
 chaos = Elementis('chaos')
-order = Elementis('order')
-elementis_list = [cosmos, flame, aqua, mystic, chaos, order]
+elementis_list = [cosmos, flame, aqua, mystic, chaos]
 
 
 # Object instance creation to run terminal game:
