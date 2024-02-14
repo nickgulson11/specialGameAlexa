@@ -4,33 +4,120 @@
 # Import necessary py-modules and libraries:
 
 import random
+import ddbCall
 
-def programme_start():
-    player_name = ''
-    player_name = input ('--> Hello and welcome to a very special secret game.  What is your name? ')
-    while player_name.lower() != 'emily':
-        player_name = input ('--> Hmm this game is not for you, try again. What is your name? ')
+names = ['Emily']
+def processName(name):
+    if name in names:
+        return "Welcome Emily thank chwod you have arrived.  Nick has been kidnapped and we need your help to free him! You must answer all these chwestions correctly to save Nick.  You have been given 3 hearts to complete the game. If you lose them all then Nick dies.  Your Chwackpack currently contains 3 items.  Collect all 5 to save his life! Say Begin to start."
+        #return "Shortened for testing.  Say Begin"
+    else :
+        return "Hmm this game is not for you..."
+
+win_msg = 'That is correct, your reward is Scarlett.  Congratulations you have answered all the questions correctly and recovered all the plush animals.  Nick has been saved from the mormons, hooray!  Love prevails and you win.  Happy Valentines Day!'
+lose_msg = 'Oh No, That was your last heart.  You lose and the mormons enslave Nick making him churn butter for all eternity.  Better luck next time, Goodbye!'
+elementis_dict = {
+                        'q1' : {
+                            'name' : 'q1',
+                            'question' : 'On your first date at Flacos Tacos where Emily blacked out, what did Nick order?',
+                                    'answers' : {1 : 'Carne asada tacos',
+                                                2 : 'Chicken tinga tacos',
+                                                3 : 'Carne asada Burrito',
+                                                4 : 'Chicken Tinga Burrito'},
+                                    'correct answer': '3',
+                                    'reward' : 'Bernardo'},
+                        'q2' : {
+                            'name' : 'q2',
+                            'question' : 'Durning an early date Nick and Emily went to a drive in movie to see the Blues Brothers.  What are the names of the two main characters?',
+                                    'answers' : {1 : 'Elroy and Jeffrey',
+                                                2 : 'Jake and Elwood',
+                                                3 : 'Elmer and John',
+                                                4 : 'Jim and Eric'},
+                                    'correct answer' : '2',
+                                    'reward' : 'Maritza'},
+                        'q3' : {
+                            'name' : 'q3',
+                            'question' : 'What was the name of the lovely Wisconsin campground where Emily camped for the first time?',
+                            'answers' : {
+                                        1 : 'Devils Lake',
+                                        2 : 'Lake Delvan',
+                                        3 : 'Plymouth Rock',
+                                        4 : 'Lost Bikini Valley'
+                            },
+                            'correct answer' : '1',
+                            'reward' : 'Judy'},
+                        'q4' : {
+                            'name' : 'q4',
+                            'question' : 'Before you started dating Nick was abroad.  What was the neighborhood in Hong Kong where he lived?',
+                            'answers' : {
+                                        1 : 'Kowloon',
+                                        2 : 'Wan Chai',
+                                        3 : 'Mong Kok',
+                                        4 : 'Sai Ying Pun'
+                                
+                            },
+                            'correct answer' : '4',
+                            'reward' : 'Pineapple Jellycat'},
+                        'q5' : {
+                            'name' : 'q5',
+                            'question' : 'Nick and Emily have celebrated many special nights.  Which event featured a shotstopus?',
+                            'answers' : {
+                                        1 : 'Nicks 23rd Birthday',
+                                        2 : 'One Year anniversary',
+                                        3 : 'Valentines day 2022',
+                                        4 : 'Two Year anniversary'
+                            },
+                            'correct answer' : '2',
+                            'reward' : 'Scarlett'}
+                    }
+
+def getNextQuestion(session):
+    sessionInfo = ddbCall.getSessionInfo(session)
+    if not sessionInfo['q1']['BOOL']:
+        question = 'q1'
+    elif not sessionInfo['q2']['BOOL']:
+        question = 'q2'
+    elif not sessionInfo['q3']['BOOL']:
+        question = 'q3'
+    elif not sessionInfo['q4']['BOOL']:
+        question = 'q4'
+    elif not sessionInfo['q5']['BOOL']:
+        question = 'q5'
     else:
-        return player_name.title()
-
-# Create class for Player in game:
-
-class Player:
+        question = 'Win'
     
-    def __init__(self, name):
-        self.player = 'Player 1'
-        self.name = name
-        self.life = 3
-        self.item_container = []
-        
-    def __repr__(self):
-        return ('''
-        --> Welcome {name} thank chwod you have arrived.  Nick has been kidnapped by mormons and we need your help to free him!
-            The mormons don't believe in monogomous love.  You must answer all these chwestions correctly to save Nick.
-            You have been given {life} hearts to complete the game. If you lose them all then Nick chwies.
-            Your Chwackpack currently contains {number} items.  Collect them all to save his life!
-        '''.format(name = self.name, life = self.life, number = len(self.item_container)))
+    return question
 
+
+def askNextQuestion(session):
+    question = getNextQuestion(session)
+    if question != 'Win':
+        message = elementis_dict[question]['question']
+        answers = elementis_dict[question]['answers']
+        return message + "Your options are, 1 " + answers[1] + " , 2 " + answers[2] + " , 3 " + answers[3] + " ,  or 4 " + answers[4]
+    else:
+        return win_msg
+
+def checkAnswer(session, answer):
+    question = getNextQuestion(session)
+    correctAnswer = elementis_dict[question]['correct answer']
+    if str(answer) == str(correctAnswer):
+        reward = elementis_dict[question]['reward']
+        ddbCall.updateQuestion(session, question)
+        if question == 'q5':
+            return [True, win_msg]
+        else:
+            return [False,'That is correct, you get a new reward in your Chwackpack! ' + reward + ' . Say Next Question to continue.']
+    else:
+        correct = False
+        resp = ddbCall.loseLife(session)
+        if resp == 'Game Over':
+            return [True, lose_msg]
+        else:
+            return [False, 'Sorry that was not the correct answer, you lost a heart.  You have ' + str(resp) + ' hearts remaining']
+        
+
+'''
     def get_reward(self, elementis):
         print('--> Your reward for this is {reward}'.format(reward = elementis.reward))
         player_1.item_container.append(elementis.reward)
@@ -44,65 +131,29 @@ class Player:
     def lose_a_life(self):
         self.life -= 1
         if self.life > 0:
-            print('''
+            print(
             --> That is not the correct answer.
-                You now have {lives} hearts remaining.'''.format(lives = self.life))
+                You now have {lives} hearts remaining.format(lives = self.life))
         else:
-            print('''
+            print(
             --> That was your last heart.  You lose and the mormons kill Nick.
-                Better luck next time, Bye!''')
+                Better luck next time, Bye!)
 
-# Create class for Elementis:
-class Elementis:
-    
-    def __init__(self, elementis):
-        self.name = elementis_dict[elementis]['name']
-        self.question = elementis_dict[elementis]['question']
-        self.answers = elementis_dict[elementis]['answers']
-        self.correct_answer = elementis_dict[elementis]['correct answer']
-        self.reward = elementis_dict[elementis]['reward']
-    
-    def __repr__(self):
-        return ('--> This Elementis is the {name}.'.format(name = str(self.name)))
-
-# Create class for Game - will contain main bulk of code:
-
-class Game:
-    
-    def __init__(self, player):
-        self.game_elementis_list = ['cosmos', 'flame', 'aqua', 'mystic', 'chaos']
-        self.correctly_answered = []
-        print(player)
-        Game.game_init(self, player)
-
-    def __repr__(self):
-        pass
-
-    def game_init(self, player):
-        print('--> Are you ready to begin?')
-        y_n = input ('--> Type Y/N and press enter: ')
-        while y_n.lower() != 'y' and y_n.lower() != 'n':
-             y_n = input ('--> Type Y/N and press enter: ')
-        if y_n.lower() == 'n':
-            print ('--> Okay Nick will go die then, bye.')
-            quit()
-        else:
-            Game.ask_question(self, chaos)
         
     def win_game(player):
-        print('''
+        print(
         --> Congratulations you have answered all the questions correctly and recovered all the plush animals.
-            Nick has been saved from the mormons.  Your reward is a 15 minute soak, hooray!  Love prevails and you win!''')
+            Nick has been saved from the mormons.  Your reward is a 15 minute soak, hooray!  Love prevails and you win)
         quit()
 
     def ask_question(self, elementis):
         print ('--> {question}'.format(question = elementis.question))
-        print('''
+        print(
         -->> 1) {answer_1}
         -->> 2) {answer_2}
         -->> 3) {answer_3}
         -->> 4) {answer_4}
-        '''.format(answer_1 = elementis.answers[1],
+        .format(answer_1 = elementis.answers[1],
                    answer_2 = elementis.answers[2],
                    answer_3 = elementis.answers[3],
                    answer_4 = elementis.answers[4]))
@@ -130,83 +181,18 @@ class Game:
 
     def elementis_rand_select(self):
         next_elementis = random.choice(self.game_elementis_list)
-        if next_elementis == 'cosmos':
-            return cosmos
-        elif next_elementis == 'flame':
-            return flame
-        elif next_elementis == 'aqua':
-            return aqua
-        elif next_elementis == 'mystic':
-            return mystic
-        elif next_elementis == 'chaos':
-            return chaos
+        if next_elementis == 'q1':
+            return q1
+        elif next_elementis == 'q2':
+            return q2
+        elif next_elementis == 'q3':
+            return q3
+        elif next_elementis == 'q4':
+            return q4
+        elif next_elementis == 'q5':
+            return q5
         
+'''
 
-#Creat dict of Elementis for object inits:
-
-elementis_dict = {
-                        'cosmos' : {
-                            'name' : 'Cosmos',
-                            'question' : 'Using modern sciences, is it possible to quantify the Cosmos completely?',
-                                    'answers' : {1 : 'Yes, with the right instruments',
-                                                2 : 'Only partially',
-                                                3 : 'Impossible to quantify limitless',
-                                                4 : 'No, but one day'},
-                                    'correct answer': '3',
-                                    'reward' : 'Bernardo'},
-                        'flame' : {
-                            'name' : 'Flame',
-                            'question' : 'Can one find the source of the Healing Flame?',
-                                    'answers' : {1 : 'Yes, by exploring the cosmos',
-                                                2 : 'It is not found, but achieved',
-                                                3 : 'No',
-                                                4 : 'Yes, can be created by craftsman'},
-                                    'correct answer' : '2',
-                                    'reward' : 'Maritza'},
-                        'aqua' : {
-                            'name' : 'Aqua',
-                            'question' : 'In the Waters of Forever, how does one survive?',
-                                    'answers' : {1 : 'No survival, you will become one with it',
-                                                2 : 'Learn to breathe inside',
-                                                3 : 'Drink it all',
-                                                4 : 'Hold your breath'},
-                                    'correct answer' : '1',
-                                    'reward' : 'Judy'},
-                        'mystic' : {
-                            'name' : 'Mystic',
-                            'question' : 'In the Arcane, is there any limitation true?',
-                                    'answers' : {1 : 'Yes, the Rule of Law',
-                                                2 : 'No, not according to the rules in place',
-                                                3 : 'Yes, spells contained in spellbooks',
-                                                4 : 'One can never be restricted if one\'s mind is endless'},
-                                    'correct answer' : '4',
-                                    'reward' : 'Pineapple Jellycat'},
-                        'chaos' : {
-                            'name' : 'Chaos',
-                            'question' : 'Was there ever truly order in the Expanse?',
-                                    'answers' : {1 : 'Yes, all things have order',
-                                                2 : 'No, the ever changing cannot be ordered',
-                                                3 : 'No, we just believe there is',
-                                                4 : 'Yes, but only in the beginning'},
-                                    'correct answer' : '2',
-                                    'reward' : 'Scarlett'}
-                    }
 # Base code for dict quick create template - copy and paste.
 base_code = {'name' : '', 'question' : '', 'answers' : {1 : '', 2 : '', 3 : '', 4 : ''}, 'correct answer' : '', 'reward' : ''}
-
-# Initiate Elementis and create list - initiate new and add as necessary (if needed):
-
-cosmos = Elementis('cosmos')
-flame = Elementis('flame')
-aqua = Elementis('aqua')
-mystic = Elementis('mystic')
-chaos = Elementis('chaos')
-elementis_list = [cosmos, flame, aqua, mystic, chaos]
-
-
-# Object instance creation to run terminal game:
-
-name_start = programme_start()
-player_1 = Player(name_start)
-new_game = Game(player_1)
-
